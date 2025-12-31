@@ -1,0 +1,22 @@
+{
+  "name": "cleaner-descargas",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "taskkill /f /im node.exe /t 2>nul & nodemon",
+    "build": "rimraf ./dist && tsc",
+    "start": "npm run build && node dist/app.js"
+  },
+  "dependencies": {
+    "chalk": "^5.3.0",
+    "inquirer": "^9.3.8"
+  },
+  "devDependencies": {
+    "@types/inquirer": "^9.0.9",
+    "@types/node": "^20.0.0",
+    "nodemon": "^3.1.0",
+    "rimraf": "^5.0.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.0"
+  }
+}
