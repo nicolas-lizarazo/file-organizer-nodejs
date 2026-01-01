@@ -13,6 +13,7 @@ export const pilarQuestions = {
                 name: 'result',
                 message: message,
                 default: defaultValue,
+                filter: (input: string) => input.replace(/["']/g, '').trim()
             }
         ])
         return result;

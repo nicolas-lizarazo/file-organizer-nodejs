@@ -1,16 +1,19 @@
 import type { IResult } from '../interface/IResult.js';
 
 export class Result {
-    constructor() {}
+    
+    // Constructor privado para obligar a usar los métodos estáticos
+    private constructor() {}
 
-    static sucess ( message: string ): IResult<void> {
+    static success(message: string): IResult<void> {
         return {
             ok: true,
             message: message,
         }
     }
 
-    static failure ( message: string, error?: unknown): IResult<unknown> {
+    // ACEPTAMOS UN GENÉRICO <T> AQUÍ
+    static failure<T = void>(message: string, error?: unknown): IResult<T> {
         return {
             ok: false,
             message: message,
@@ -18,7 +21,7 @@ export class Result {
         }
     }
 
-    static sucessWithValue<T> ( value: T, message: string ): IResult<T> {
+    static successWithValue<T>(value: T, message: string): IResult<T> {
         return {
             ok: true,
             message: message,
