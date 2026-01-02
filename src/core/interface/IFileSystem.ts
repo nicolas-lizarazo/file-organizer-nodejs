@@ -8,4 +8,5 @@ export interface IFileSystem {
     moveFile ( oldPath: string, newPath: string ): IResult<void>;
     joinPath ( firstPath: string, secondPath: string ): string;
     createDirectory( sourcePath: string ): void;
+    isDirectory( sourcePath: string ): boolean;
 }

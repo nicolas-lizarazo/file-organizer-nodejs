@@ -4,66 +4,57 @@ import { FILE_ORGANIZER_RULES } from "../../config/FileTypes.js";
 import type { IResult } from "../interface/IResult.js";
 
 export class FileOrganizer {
-    // private fileSystem: IFileSystem;
-
-    // constructor(fs: IFileSystem) {
-    //     this.fileSystem = fs; 
-    // }
-
-    // atajo typescript, priivate readonly declara y asigna en una sola linea un atributo
     constructor(
         private readonly fileSystem: IFileSystem,
         private readonly sourcePath: string,
-    ){}
+    ) {}
 
     public verifyPath = (): IResult<string[]> => {
-        if ( this.fileSystem.existDirectory( this.sourcePath ) ) {
-            const directoryFiles = this.fileSystem.readDirectory( this.sourcePath );
-            return Result.successWithValue( directoryFiles, 'archivos obtenidos' );
-        } else return Result.failure<string[]>(`Error, no se ha encontrado la ruta ${this.sourcePath}`);
-    }
-    
-    public moveFiles = (directories: string[]): IResult<void> => {
-        let errors: string[] = [];
-        directories.forEach( fileName => {
-            let pathDirectory = this.fileSystem.obtainExtPath( fileName );
-            // devuelve una matriz de matrices ( array de pares ) , encontrar coincidencia, destructurar arreglo bidimencional que tiene nombre y extenciones en forma de arreglo ['imagenes',[['jpg'],['png']]] en dos como si se hiciera item[0], item
-            const folderName = Object.entries(FILE_ORGANIZER_RULES).find(( [folder, extensions] ) => {
-                return (extensions as readonly string[]).includes(pathDirectory);
-            })?.[0] || 'Otros';
-
-            const oldPath = this.fileSystem.joinPath( this.sourcePath, fileName );
-            const newFolderPath = this.fileSystem.joinPath( this.sourcePath, folderName );
-            const newPath = this.fileSystem.joinPath( newFolderPath, fileName );
-
-            if ( !this.fileSystem.existDirectory( newFolderPath ) ) {
-                this.fileSystem.createDirectory( newFolderPath );
-            }
-
-            const result = this.fileSystem.moveFile( oldPath, newPath );
-
-            if ( !result.ok ) {
-                errors.push(`${fileName}: ${result.message}`)
-            }
-        })
-
-        if ( errors.length > 0 ) {
-            return Result.failure("Proceso completado con algunos errores", errors);
+        if (!this.fileSystem.existDirectory(this.sourcePath)) {
+            return Result.failure<string[]>(`Ruta no encontrada: ${this.sourcePath}`);
         }
+        const directoryFiles = this.fileSystem.readDirectory(this.sourcePath);
+        return Result.successWithValue(directoryFiles, 'Archivos obtenidos');
+    }
 
-        return Result.success("Todos los archivos se movieron exitosamente");
+    public moveFiles = (items: string[]): IResult<void> => {
+        const errors: string[] = [];
+        const protectedNames = [...Object.keys(FILE_ORGANIZER_RULES), 'Carpetas', 'Otros'];
+
+        items.forEach(itemName => {
+            if ( protectedNames.includes( itemName ) ) return;
+
+            const fullPath = this.fileSystem.joinPath( this.sourcePath, itemName );
+            
+            const folderName = this.getDestinationFolder( fullPath, itemName );
+            const newFolderPath = this.fileSystem.joinPath( this.sourcePath, folderName );
+            const newPath = this.fileSystem.joinPath( newFolderPath, itemName );
+
+            this.ensureDirectoryExists( newFolderPath );
+            const result = this.fileSystem.moveFile(fullPath, newPath);
+
+            if ( !result.ok ) errors.push( `${itemName}: ${result.message}` );
+        });
+
+        return errors.length > 0 
+            ? Result.failure("Completado con errores", errors)
+            : Result.success("Organización exitosa");
+    }
+
+    private getDestinationFolder( fullPath: string, fileName: string ): string {
+        if ( this.fileSystem.isDirectory( fullPath ) ) return 'Carpetas';
+
+        const extension = this.fileSystem.obtainExtPath( fileName );
+        const entry = Object.entries( FILE_ORGANIZER_RULES ).find(( [_, exts] ) => 
+            ( exts as readonly string[] ).includes( extension )
+        );
+
+        return entry ? entry[0] : 'Otros';
+    }
+
+    private ensureDirectoryExists(path: string): void {
+        if ( !this.fileSystem.existDirectory( path ) ) {
+            this.fileSystem.createDirectory( path );
+        }
     }
 }
-
-
-/* 
-extensiones_map = {
-    'Documentos': ['.pdf', '.docx', '.txt', '.xlsx'],
-    'Imagenes': ['.jpg', '.png', '.gif', '.webp'],
-    'Videos': ['.mp4', '.mkv', '.mov'],
-    'Musica': ['.mp3', '.wav', '.flac'],
-    'Programacion': ['.py', '.js', '.html', '.css', '.cpp'],
-    'Comprimidos': ['.zip', '.rar', '.7z'],
-    'Instaladores': ['.exe', '.msi', '.dmg']
-}
-*/

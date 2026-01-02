@@ -8,11 +8,11 @@
     "declaration": true,
     "declarationMap": true,
     "strict": true,
-    "skipLibCheck": true, // Vital para que no analice node_modules
+    "skipLibCheck": true,
     "moduleDetection": "force",
     "verbatimModuleSyntax": true,
     "isolatedModules": true
   },
-  "include": ["src/**/*"], // Solo analiza lo que esté en src
-  "exclude": ["node_modules", "dist", "**/*.test.ts"] // ESTO es lo que calmará tus ventiladores
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist", "**/*.test.ts"]
 }

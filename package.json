@@ -3,9 +3,10 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "nodemon src/app.ts",
+    "dev": "node --no-warnings --loader ts-node/esm src/app.ts",
+    "dev:watch": "nodemon --exec node --no-warnings --loader ts-node/esm src/app.ts",
     "build": "rimraf ./dist && tsc",
-    "start": "npm run build && node dist/app.js"
+    "start": "npm run build && node --no-warnings dist/app.js"
   },
   "dependencies": {
     "chalk": "^5.3.0",

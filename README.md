@@ -31,6 +31,15 @@ El proyecto sigue una estructura de capas para garantizar la escalabilidad y fac
 
 ---
 
+## 📸 Resultado
+Así es como se interactua con el CLI para organizar tus carpetas:
+
+![Ejemplo de uso](/assets/ejemplo-uso.png)
+
+Así es como el CLI organiza automáticamente tus carpetas:
+
+![Ejemplo de organización](/assets/result-organizer.png)
+
 ## 🛠 Instalación y Configuración
 
 1.  **Clonar el repositorio:**
